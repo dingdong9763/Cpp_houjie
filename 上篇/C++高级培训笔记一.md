@@ -50,6 +50,9 @@
 
 比如 ```const double& real (const double & a) const { return re;}```
 第一个const表示返回的re不会被改变，第二个const表示传进来的参数不会被改变，第三个const表示函数不会修改类的成员变量。
+
+返回值传递类型是否用引用取决于函数体内返回的对象是否在函数体外已经存在。
+
 ## 6.友元 ##
 ![](https://i.imgur.com/72ZMZHz.png)
 
@@ -63,9 +66,13 @@
 
 ## 8.总结 ##
 1⃣️数据一定放在private里
+
 2⃣️参数尽可能以reference来传，看状况加const
+
 3⃣️返回值也尽量用reference来传，在可能的情况下
+
 4⃣️在类的本体body里能加const的就要加，如果不加的话可能使用者使用的时候会报错
+
 5⃣️构造函数要尽量用initialization list，初始化列表。
 
 ## 9.规范化代码一 ##
