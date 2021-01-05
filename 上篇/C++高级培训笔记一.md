@@ -31,6 +31,8 @@
 
 ##  5.参数传递和返回值使用const引用 ##
 ![](https://i.imgur.com/fSYQbDM.png)
+类的成员函数如果加了const，说明这个成员函数保证不会修改类的成员变量。
+
 引用在底部就相当于一个指针，引用是封装起来的指针。
 
 尽量不要pass by value，传值效率低下，传引用会更快。
@@ -45,6 +47,9 @@
 
 当然，如下图所示，对于临时变量也不能返回引用：
 ![](https://i.imgur.com/zCKy5kk.png)
+
+比如 ```const double& real (const double & a) const { return re;}```
+第一个const表示返回的re不会被改变，第二个const表示传进来的参数不会被改变，第三个const表示函数不会修改类的成员变量。
 ## 6.友元 ##
 ![](https://i.imgur.com/72ZMZHz.png)
 
