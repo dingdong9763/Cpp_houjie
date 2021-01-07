@@ -42,7 +42,8 @@
 先调用析构函数（把字符串里面动态分配的内容删掉），再释放内存（内部调用free），此时才把字符串本身（一个指针）杀掉。
 
 array new一定要搭配array delete使用，不然可能会造成内存泄漏。
-```String* p = new String[3];
+```
+   String* p = new String[3];
    delete[] p;//此处delete后面要加中括号
 ```
 如果不加中括号，编译器不知道要调用几次析构函数。
