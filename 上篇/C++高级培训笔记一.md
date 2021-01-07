@@ -51,7 +51,7 @@
 比如 ```const double& real (const double & a) const { return re;}```
 第一个const表示返回的re不会被改变，第二个const表示传进来的参数不会被改变，第三个const表示函数不会修改类的成员变量。
 
-返回值传递类型是否用引用取决于函数体内返回的对象是否在函数体外已经存在。
+返回值传递类型是否用引用取决于函数体内返回的对象是否在函数体外已经存在。函数执行的结果只要不是放到local object，就可以传reference。
 
 ## 6.友元 ##
 ![](https://i.imgur.com/72ZMZHz.png)
