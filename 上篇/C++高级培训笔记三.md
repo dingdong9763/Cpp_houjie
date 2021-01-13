@@ -41,6 +41,30 @@ virtual void error(const std::string& msg); //impure virtual，子类可以有�
 int objectID() const; //non-virtual，不需要下面的子类重新定义
 ```
 
+Template Method 模版方法模式
+
+父类实现一个接口类，子类通过虚函数实现具体的操作，使用时可以通过子类的对象调用父类的函数。
+
+
+## Inheritance（继承）+Composition（复合） 关系下的析构和构造 ##
+1.当子类有Component时
+
+构造由内而外
+
+Derived 的构造函数首先调用 Base 的 default 构造函数，然后调用 Component 的 default 构造函数，然后才执行自己的。
+
+代码类似这样：Derived::Derived(…): Base() , Component() { … };
+
+析构由外而内
+
+Derived 的析构函数首先执行自己，然后调用 Component 的析构函数，然后调用 Base 的析构函数。
+
+代码类似这样：Derived::~Derived(…) { … ~Component(), ~Base() }; 。
+
+其实也很好想，构造时从里面一层一层往外构造，拆除时肯定要从外面开始，一层一层的拆掉。
+
+2.当父类有Component时，子类的构造函数先调用Component part的构造函数，再调用Base part的构造函数，最后调用子类的构造函数，析构反过来。
+
 ## C++中的explicit ##
 C++中， 一个参数的构造函数(或者除了第一个参数外其余参数都有默认值的多参构造函数)， 承担了两个角色。 1 是个构造器 ，2 是个默认且隐含的类型转换操作符。
 
