@@ -33,6 +33,8 @@
 
 ![](https://i.imgur.com/8TiNyqF.jpg)
 
+容器本身一定带有迭代器，迭代器也是一种智能指针，代表容器里的一个元素，要处理很多个符号，比如++--，用于指针的移动，可以遍历容器。最关键的还是 * 以及 -> ，星号取出了这个node指针的data数据，->则是利用了 * 操作符重新取回原地址来实现的。
+
 创建一个list迭代器对象，list<Foo>::iterator ite;这里的list用于保存Foo对象，也就是list模板定义里的class T，operator\*()返回的是一个(\*node).data对象，node是\_\_link\_type类型，然而\_\_link\_type又是\_\_list\_node<T\>\*类型，这里的T是Foo，所以node是\_\_list\_node<Foo\>*类型,所以\(\*node\).data得到的是Foo类型的一个对象，而&\(operator\*\(\)\)最终得到的是该Foo对象的一个地址，即返回Foo\* 类型的一个指针。
 
 ## 4.仿函数 ##
