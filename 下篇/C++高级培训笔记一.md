@@ -111,6 +111,49 @@ reference可以看做是某个被引用变量的别名。
 ![](https://i.imgur.com/3rfj4at.png)
 ![](https://i.imgur.com/iVYlytf.jpg)
 
+```
+int x = 0; //变量，占用4个字节
+int* p = &x; // 指针变量，占用4个字节（32位）。pointer to int。指向整数x，初值是x的地址，&表示取地址。地址就是指针的一种形式，指针也是地址的一种形式，是互通的。
+int& r = x; // r从逻辑上来说不是指针，代表整数，但是编译器会用指针的方式实现r，reference底部是一个指针，指向x。r is a reference to x. r代表x.现在r,x都是0。 
+            // sizeof(r) == sizeof(x)，x多大r就多大。所以r的大小是4。
+            // 引用要设初值。指针可以变化，但是reference不可以变化，指向后不可以改变。
+            // &x == &r; object和其reference的大小相同，地址也相同（但是全都是假象）
+int x2 = 5;
+r = x2; // r不能重新代表其他物体，但是可以重新设值。所以现在r,x的值都是5。
+int& r2 = r; // 现在r2是5（r2代表r；亦相当于代表x）
+
+```
+
+**reference的常见用途**
+
+我们在写代码的时候很少这样用reference去代表一个变量，我们一般把reference用在参数传递上，主要还是为了让reference更像传递进来了一个对象，而不是一个指针，在写法上，其底层是表示一个指针。
+
+reference通常不用于声明变量，而用于参数类型和返回类型的描述。
+
+```
+void func1 (Cls* pobj) { pobj->xxx(); } // pass by pointer 被调用端写法不同
+void func2 (Cls obj) { obj.xxx(); } // pass by value
+void func3(Cls& obj) { obj.xxx(); } // pass by reference 与上面的被调用端写法相同是很好的
+
+......
+
+Cls obj;
+func1(&obj); // 接口不同，会造成困扰
+func2(obj); // 传递过程比较慢
+func3(obj); // 调用端接口相同，表述相同，也很好。而且传引用比较快。
+
+```
+
+以下被视为“same signature” （所以二者不能同时存在）：签名指的是```imag(...) const``` 这一部分。因为这两个函数是同名函数，但是如果是像上面的func2/func3名字不相同就没问题。
+```
+double imag(const double& im) const { ... }
+double imag(const double  im) const { ... } //Ambiguity二义
+```
+
+Q：const是不是函数签名的一部分？
+
+A：是一部分。所以上面两个函数如果一个有const一个没有，是可以共存的。
+
 ## 14.虚指针和虚函数表 ##
 ![](https://i.imgur.com/nIkKZhP.jpg)
 如上图所示，定义了三个类，A、B和C，B继承于A,C继承于B，A中有两个虚函数，B中有一个，C中也有一个。编译器将A的对象a在内存中分配如上图所示，只有两个成员变量m\_data1和m\_data2，与此同时，由于A类有虚函数，编译器将给a对象分配一个空间用于保存虚函数表，这张表维护着该类的虚函数地址（动态绑定），由于A类有两个虚函数，于是a的虚函数表中有两个空间（黄蓝空间）分别指向A::vfunc1()和A::vfunc2()；同样的，b是B类的一个对象，由于B类重写了A类的vfunc1()函数，所以B的虚函数表（青色部分）将指向B::vfunc1()，同时B继承了A类的vfunc2()，所以B的虚函数表（蓝色部分）将指向父类A的A::vfunc2()函数；同样的，c是C类的一个对象，由于C类重写了父类的vfunc1()函数，所以C的虚函数表（黄色部分）将指向C::vfunc1()，同时C继承了超类A的vfunc2()，所以B的虚函数表（蓝色部分）将指向A::vfunc2()函数。同时上图也用C语言代码说明了编译器底层是如何调用这些函数的，这便是面向对象继承多态的本质。
