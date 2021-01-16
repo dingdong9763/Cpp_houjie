@@ -80,14 +80,30 @@ select1st <pair> () ()
 ![](https://i.imgur.com/wulBSIu.png)
 ![](https://i.imgur.com/sUNnTCc.png)
 
-## 11.可变数目模板参数 ##
+## 11.可变数目模板参数 Variadic Templates##
 ![](https://i.imgur.com/YqS87h4.jpg)
 过多内容将在C++11课程中讲解，这里暂时只做介绍。
+
+模板参数的个数可变化，分为一个和后部分一个包，用…表示，以递归的形式进行，让一个包递归，这个包的第一个参数就会输出，… 指定包的个数为0，就会调用void print（）函数，所以一定有一个这样的空函数。
+
+…在这里表示一个pack(包)，这里的代码就是打印出输入的参数，最后参数为0的时候，为了防止程序错误，给出一个空参数的print。
+如果想知道这一个包有几个，可以使用sizeof…(args);
+
 
 ## 12.auto关键字和增强型for循环
 ![](https://i.imgur.com/C3Gmlaa.png)
 ![](https://i.imgur.com/HwUMzfD.png)
 过多内容将在C++11课程中讲解，这里暂时只做介绍
+
+for的新形式
+
+decl是一个变量，coll表示容器，编译器从coll这个容器里抓出变量赋值给decl。
+
+在以前可以使用foreach来遍历容器，可以使用迭代器来遍历容器。现在c++11增加了这一种新的方式。
+
+这里是pass by value,如果在里面修改elem的大小，也不会改变原来容器里变量的大小。如果需要修改的话，需要pass by reference。 
+
+reference,其实内部就是由指针实现的。只是表现的形式不同。
 
 ## 13.reference ##
 reference可以看做是某个被引用变量的别名。
