@@ -232,7 +232,84 @@ pa->vfunc1();//属于动态绑定，符合指针，向上转型（new的是一�
 (* p->vptr[n]) (p );
 ```
 
-## 18.重载delete和new操作符 ##
+## 18.谈谈const ##
+```
+double real () const { return re; } //const放在这里是为了修饰这个成员函数，只能放在成员函数后面。意思是告诉编译器这个成员函数是不打算改变data数据，只会读。
+```
+const对象只能调用const函数，不能调用non-const函数。const对象意味着data members数据不能变动，const函数意味着保证不修改data members。
+
+non-const对象（data members可以改变）可以调用non-const函数（不保证data members不改变）。
+
+non-const对象也可以调用const函数，但是当non-const函数和const函数都存在时，non-const对象调用non-const函数，const对象调用const函数。
+
+# const 加参数前面 #
+```
+void Show(const int&, const int&);
+void Show(const int& num1, const int& num2) {
+	//我们希望显示函数中，只能实现传入参数的显示功能
+	//而禁止显示函数修改num1和num2的值（禁止函数内部修改引用参数值）
+	//解决方案：在参数中使用const
+	cout << num1 << "," << num2 << endl;
+	//num1 = 998; 报错，禁止修改
+}
+```
+# const 加在函数前面 #
+```
+sum(num1) = 55//只有在C++中才可以这样赋值，函数在左边
+以下是例子：
+
+int& sum(int& num1) {
+	num1++;
+	return num1;
+}
+
+int main() {
+	int num1 = 10;
+	int result1 = sum(num1);
+	cout << result1 << endl;  //11
+
+	int& result2 = sum(num1);
+	//sum()是一个返回值的引用，又是result的引用，所以result和sum(num1)等价，
+	//令sum(num1)=55,也就是令result=55；
+	sum(num1) = 55;  //只有在C++中才可以这样赋值，函数在左边
+	cout << result2 << endl;  //55
+}
+```
+建议解决方案：
+1.将返回值类型修改为const int& const 
+
+int& sum(int& num1){…}
+
+2.const类型为不可以修改的左值，sum(num1)=55将不合法；
+
+3.省略const会使函数的含义更加模糊，建议避免在设计函数中存在模糊的情况，因为模糊会增加犯错误的机会，应尽量避免犯错
+
+const 加在函数后面，说明这个成员函数不能修改类的成员变量，只做读操作。
+
+```
+class AA {
+public:
+	void eating(string food) const {
+		cout << "吃" << food << '1' << endl;
+	}
+
+	void eating(string& food) {
+		cout << "吃" << food << '2' << endl;
+	}
+};
+
+
+int main() {
+	//调用:
+	string food = "佛跳墙";
+	const AA a;
+	AA b;
+	a.eating(food);   //输出  吃佛跳墙1
+	b.eating(food);   //加入了const可以区分	输出  吃佛跳墙2		  
+}
+```
+
+## 19.重载delete和new操作符 ##
 ![](https://i.imgur.com/h5tWgeY.png)
 ![](https://i.imgur.com/EYF1OCI.png)
 ![](https://i.imgur.com/XZg8al9.png)
@@ -240,7 +317,112 @@ pa->vfunc1();//属于动态绑定，符合指针，向上转型（new的是一�
 ![](https://i.imgur.com/WtkG1Kv.jpg)
 ![](https://i.imgur.com/EUhdjmM.jpg)
 
-## 19.重载delete()和new()操作符 ##
+new:先分配内存，再调用构造函数
+
+delete：先调用析构函数，再释放内存
+
+array new一定要搭配array delete
+
+这里补充的是 重载::operator new, ::operator delete, ::operator new[], ::operator delete[] 的形式，不过一旦重载了这2个操作符，影响是无穷无尽的，谨慎。
+这张图是重载这四个操作符的接口函数，这是全局的。
+
+
+# 重载member operator new/delete（成员函数的new、delete重载）#
+
+在成员函数里，写法和原来全局的基本类似，在创建Foo指针p的时候，先创建一个临时指针并且开辟一块空间给它，再将整个临时指针强制转换为p的类型，同时赋值给p，再进行p的对象的构造。
+
+如果是delete的话，这时候先对整个对象进行析构，再释放这块内存。
+
+# 重载member operator new[]/delete[] #
+如果是new[]和delete[]的话，传入的大小需要改变为```sizeof(foo) * n```,当然在这块内存里面，我们需要进行n个对象的构造。进行析构的时候也是一样，析构n个，然后释放总的内存
+
+# 示例，接口 #
+下面是一个具体的例子，同样的是创建一个p指向new的Foo对象，如果没有member operator new和delete就使用全局的。
+
+如果想直接采用全局的new（强制采用全局）就需要使用下面的写法
+
+```
+Foo* pf = ::new Foo;
+::delete pf;
+```
+
+```
+#include <iostream>
+using namespace std;
+// 该节配合上篇关于内存讲解部分一起食用
+// 可以重载 全局new delete new[] delete[]
+// 重载成员函数的new delete new[] delete[] 用于内存管理 内存池
+
+// #1 new和malloc的区别 对象在调用new的时候 是先调用malloc申请一片内存 然后调用ctor进行对象初始化
+// 对象在调用delete的时候 是先调用dtor 然后释放内存
+
+class Foo {
+public:
+    void* operator new(size_t);
+    void operator delete(void*, size_t);
+
+    void* operator new[](size_t);
+    void operator delete[](void*, size_t);
+};
+
+int main() {
+    // #1 当调用new的时候 实际上执行流程是
+    // try {
+    //     #1 调用全局new申请一片内存 返回一个指针指向这块内存
+    //     void* mem = operator new(sizeof(Foo));
+    //     #2 将mem转化为Foo*类型指针
+    //     Foo* p = static_cast<Foo*>(mem);
+    //     #3 调用构造函数
+    //     p->Foo();
+    // }
+    Foo *p =new Foo;
+    // #2 调用delete的时候
+    // p->~Foo(); // #1先调用析构函数
+    // operator delete(p) // #2调用全局delete释放内存空间
+    delete p;
+
+    // #1 当调用new的时候 实际上执行流程是
+    // try {
+    //     #1 调用全局new申请一片内存 返回一个指针指向这块内存 内存大小为数组大小加上前后缀用来表示占用空间大小 具体看上篇内容
+    //     void* mem = operator new(sizeof(Foo)*N+4);
+    //     #2 将mem转化为Foo*类型指针
+    //     Foo* p = static_cast<Foo*>(mem);
+    //     #3 调用构造函数
+    //     p->Foo(); 调用N次
+    // }
+    const int N = 9;
+    Foo *pn =new Foo[N];
+    // #2 调用delete的时候
+    // p->~Foo(); // #1先调用析构函数 调用N次
+    // operatnor delete(p) // #2调用全局delete释放内存空间
+    delete pn;  
+}
+```
+
+在上面对于成员操作符new和delete进行重载的时候，为了防止出错，首先先分配了内存，保证最基本的实现。
+
+对于上面，int 是 4个字节，long也是四个字节（32位机），string实际是指针，所以是4个字节，一个Foo一共占用12个字节。
+
+如果对于一个对象new分配的大小那么是多少呢，如果是new就是简单的创建一个大小，如果有虚函数，会加上一个虚指针的大小。所以看到最上面输出12，如果里面有虚函数，就会增加4个字节，所以下面输出16.
+
+对于```Foo *pArray = new Foo[5]; ```，会增加4个字节用来存放这个5，也称为counter（计数器），所以12*5+4=64，输出64，下面带了虚函数的是16*5+4=84，输出84
+
+
+对于全局操作符（也就是写上了global scope operator::），也是类似的，counter还是有，但不会进入刚刚那些重载的函数。
+
+## 20.重载delete()和new()操作符 ##
 ![](https://i.imgur.com/c8jAMdu.png)
 ![](https://i.imgur.com/Sd2vMWM.jpg)
 ![](https://i.imgur.com/3Mgirvx.jpg)
+placement new
+
+之前是 new foo() ,现在是new（） foo；每个版本有不同的参数且第一个参数时size_t，要给大小
+
+我们可以重载class member operator new()，写出多个版本，前提是每一版本的声明都必须有独特的参数列，其中第一个参数必须是size_t，其余参数以new所指定的placement arguments为初值。
+出现于new(...)小括号内的即为placement arguments。
+
+```
+Foo* pf = new(300, 'c') Foo; //因为第一个参数必须是size_t，所以相当于一共有三个参数
+```
+
+但是这时候delete也可以重载，也可以重载class member operator delete()，写出多个版本。但是它们绝对不会被delete调用，只有当new所调用的构造函数抛出异常的时候，才会调用这些重载的operator delete()。它只可能这样被调用，主要为了归还未能完全创建成功的object所占用的memory.（因为new的过程是分配内存，转型，再调用构造函数，而此时抛出异常了，就会失败，要避免此时的内存泄漏）
