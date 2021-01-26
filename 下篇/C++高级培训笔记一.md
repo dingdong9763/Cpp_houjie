@@ -430,3 +430,6 @@ Foo* pf = new(300, 'c') Foo; //因为第一个参数必须是size_t，所以相�
 即使operator delete(...)未能一一对应于operator new(...)，也不会出现任何报错。这个意思是放弃处理构造函数抛出的异常。 
 
 测试所有的new，在foo(1)的时候抛出异常了，应该调用对应的重载的delete（）。
+
+### basic_string使用new(extra)扩充申请量 ###
+标准库里string类使用重载placement new实现reference counting计数器，这样是为了可以悄无声息地多增加一些空间。
