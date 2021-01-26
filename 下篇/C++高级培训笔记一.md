@@ -426,3 +426,7 @@ Foo* pf = new(300, 'c') Foo; //因为第一个参数必须是size_t，所以相�
 ```
 
 但是这时候delete也可以重载，也可以重载class member operator delete()，写出多个版本。但是它们绝对不会被delete调用，只有当new所调用的构造函数抛出异常的时候，才会调用这些重载的operator delete()。它只可能这样被调用，主要为了归还未能完全创建成功的object所占用的memory.（因为new的过程是分配内存，转型，再调用构造函数，而此时抛出异常了，就会失败，要避免此时的内存泄漏）
+
+即使operator delete(...)未能一一对应于operator new(...)，也不会出现任何报错。这个意思是放弃处理构造函数抛出的异常。 
+
+测试所有的new，在foo(1)的时候抛出异常了，应该调用对应的重载的delete（）。
