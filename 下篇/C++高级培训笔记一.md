@@ -215,6 +215,8 @@ n表示表的第几个。
 ![](https://i.imgur.com/PH9T0ss.jpg)
 this指针其实可以认为是指向当前对象内存地址的一个指针，如上图所示，由于基类和子类中有虚函数，this->Serialize()将动态绑定，等价于(*(this->vptr)[n])(this)。可以结合上节虚指针和虚函数表来理解，至于最后为什么这样写是正确的，下面小结将会解释。
 
+其实每个类里面都会有一个默认的this指针，子类创建一个对象myDoc，这个对象调用父类的方法，&myDoc就相当于OnfileOpen函数里面的this指针了，再通过这个this指针找到被子类重写的virtual Serialize 函数。
+
 ## 17.动态绑定 ##
 ![](https://i.imgur.com/C97NUFQ.jpg)
 ![](https://i.imgur.com/lDi3V3I.jpg)
