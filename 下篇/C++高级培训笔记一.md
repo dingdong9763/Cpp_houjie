@@ -242,7 +242,7 @@ non-const对象（data members可以改变）可以调用non-const函数（不�
 
 non-const对象也可以调用const函数，但是当non-const函数和const函数都存在时，non-const对象调用non-const函数，const对象调用const函数。
 
-# const 加参数前面 #
+### const 加参数前面 ###
 ```
 void Show(const int&, const int&);
 void Show(const int& num1, const int& num2) {
@@ -253,7 +253,7 @@ void Show(const int& num1, const int& num2) {
 	//num1 = 998; 报错，禁止修改
 }
 ```
-# const 加在函数前面 #
+### const 加在函数前面 ###
 ```
 sum(num1) = 55//只有在C++中才可以这样赋值，函数在左边
 以下是例子：
@@ -327,16 +327,16 @@ array new一定要搭配array delete
 这张图是重载这四个操作符的接口函数，这是全局的。
 
 
-# 重载member operator new/delete（成员函数的new、delete重载）#
+### 重载member operator new/delete（成员函数的new、delete重载）###
 
 在成员函数里，写法和原来全局的基本类似，在创建Foo指针p的时候，先创建一个临时指针并且开辟一块空间给它，再将整个临时指针强制转换为p的类型，同时赋值给p，再进行p的对象的构造。
 
 如果是delete的话，这时候先对整个对象进行析构，再释放这块内存。
 
-# 重载member operator new[]/delete[] #
+### 重载member operator new[]/delete[] ###
 如果是new[]和delete[]的话，传入的大小需要改变为```sizeof(foo) * n```,当然在这块内存里面，我们需要进行n个对象的构造。进行析构的时候也是一样，析构n个，然后释放总的内存
 
-# 示例，接口 #
+### 示例，接口 ###
 下面是一个具体的例子，同样的是创建一个p指向new的Foo对象，如果没有member operator new和delete就使用全局的。
 
 如果想直接采用全局的new（强制采用全局）就需要使用下面的写法
